@@ -4,7 +4,7 @@ from twisted.internet import reactor
 from sys import stdout
 
 PORT = 8006
-HOST = '127.0.0.1'  # 182.254.221.13
+HOST = '182.254.221.13'  # 182.254.221.13
 
 
 class Echo(Protocol):
