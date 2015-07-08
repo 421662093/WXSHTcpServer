@@ -8,7 +8,7 @@ from ..models import Client, collection
 from . import common
 import time
 
-client = set()
+clientlist = set()
 
 import threading
 
@@ -16,13 +16,16 @@ import threading
 def sayhello():
     global client
     print u'检查活跃主机：'
-    i = 0
-    for item in client:
-        if i == 0:
-            i += 1
-            item.transport.write(
-                'ret:' + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + '\n')
-        print str(item.transport.getTcpKeepAlive()) + ':' + item.transport.getPeer().host + ':' + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    for item in clientlist:
+        try:
+            if item.transport.getTcpKeepAlive():
+                item.transport.write(
+                    'ret:' + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + '\n')
+                print str(item.transport.getTcpKeepAlive()) + ':' + item.transport.getPeer().host + ':' + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            else:
+                print 'diushi1'
+        except AttributeError:
+            print 'diushi2'
     global t  # Notice: use global variable!
     t = threading.Timer(5.0, sayhello)
     t.start()
@@ -55,8 +58,6 @@ class WXSH(LineOnlyReceiver):
 
         self.factory.addClient(self, self.getId())
         self.transport.write("{'ret':1}")
-        global client
-        print client
 
     def connectionLost(self, reason):
         log.msg("已断开: %s" % self.getId())
@@ -71,6 +72,7 @@ class WXSH(LineOnlyReceiver):
 
 class WXSHFactory(Factory):
     protocol = WXSH
+    global clientlist
 
     def __init__(self):
             # self.clients = []
@@ -85,9 +87,9 @@ class WXSHFactory(Factory):
         return len(self.player)
 
     def addClient(self, newclient, dev_id):
-        global client
+
         # self.clients.append(newclient)
-        client.add(newclient)
+        clientlist.add(newclient)
 
         if Client.getcount(dev_id) == 0:
             c = Client()
@@ -100,8 +102,8 @@ class WXSHFactory(Factory):
                 **{'set__state': 1, 'set__activa_data': common.getstamp()})
 
     def delClient(self, client, dev_id):
-        # self.clients.remove(client)
-        self.clients.discard(client)
+        # self.clients.discard(client)
+        clientlist.remove(client)
         Client.objects(device_id=dev_id).update_one(
             **{'set__state': 0, 'set__activa_data': common.getstamp()})
 
