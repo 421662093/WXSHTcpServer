@@ -7,7 +7,9 @@ from twisted.python import log
 from ..models import Client, collection
 from . import common
 import time
-
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 clientlist = set()
 
 import threading
@@ -19,13 +21,14 @@ def detection():
             if item.transport.getTcpKeepAlive():
                 item.transport.write(
                     'ret:' + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + '\n')
-                log.msg(str(item.transport.getTcpKeepAlive()) + ':' + item.transport.getPeer().host + ':' + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                log.msg(str(item.transport.getTcpKeepAlive()) + ':' + item.transport.getPeer(
+                ).host + ':' + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
             else:
                 item.factory.delClient(item, item.getId())
-                log.msg('移除'
+                log.msg('remove')
         except AttributeError:
             item.factory.delClient(item, item.getId())
-            log.msg('移除attr')
+            log.msg('remove attr')
 
 '''
 def sayhello():
@@ -48,6 +51,7 @@ t=threading.Timer(5.0, sayhello)
 t.start()
 '''
 
+
 class WXSH(LineOnlyReceiver):
 
     # def dataReceived(self, data):
@@ -67,16 +71,16 @@ class WXSH(LineOnlyReceiver):
         try:
             self.transport.setTcpKeepAlive(1)
         except AttributeError:
-            print u'意外中断'
-            log.msg("意外丢失 %s" % self.getId())
+            print 'close'
+            log.msg("lose %s" % self.getId())
             self.factory.delClient(self, self.getId())
 
         self.factory.addClient(self, self.getId())
         self.transport.write("{'ret':1}")
 
     def connectionLost(self, reason):
-        log.msg("已断开: %s" % self.getId())
-        print self.getId() + u'已中断'
+        log.msg("close: %s" % self.getId())
+        print self.getId() + 'close'
         self.factory.delClient(self, self.getId())
 
     def getlist(self):
@@ -86,17 +90,18 @@ class WXSH(LineOnlyReceiver):
 
 
 class WXSHFactory(Factory):
-    protocol=WXSH
+    protocol = WXSH
+
     global clientlist
 
     def __init__(self):
             # self.clients = []
-        self.clients=set()
-        self.player=[]
-        self.msg=''
-        self.x=range(100, 700)
-        self.y=range(100, 500)
-        print u'服务器已启动'
+        self.clients = set()
+        self.player = []
+        self.msg = ''
+        self.x = range(100, 700)
+        self.y = range(100, 500)
+        log.msg('start')
 
     def getPlayerId(self):
         return len(self.player)
@@ -107,10 +112,10 @@ class WXSHFactory(Factory):
         clientlist.add(newclient)
 
         if Client.getcount(dev_id) == 0:
-            c=Client()
-            c._id=collection.get_next_id('client')
-            c.device_id=dev_id
-            c.state=1
+            c = Client()
+            c._id = collection.get_next_id('client')
+            c.device_id = dev_id
+            c.state = 1
             c.save()
         else:
             Client.objects(device_id=dev_id).update_one(
@@ -128,33 +133,33 @@ class WXSHFactory(Factory):
             proto.transport.write(
                 '<cross-domain-policy><allow-access-from domain="127.0.0.1" to-ports="*"/></cross-domain-policy>\0')
         else:
-            arr=data.split(':')
-            prefix=arr[0]
-            content=arr[1]
+            arr = data.split(':')
+            prefix = arr[0]
+            content = arr[1]
             if prefix.find('player') != -1:
-                newPlayer=[content, str(random.randrange(200, 600)), str(
+                newPlayer = [content, str(random.randrange(200, 600)), str(
                     random.randrange(150, 350)), str(random.randrange(1, 5))]
                 self.player.append(newPlayer)
-                self.msg=' 玩家 ' + content + ' comments111!'
+                self.msg = ' 玩家 ' + content + ' comments111!'
                 # 广播所有玩家的位置
-                temp=[]
-                playerData=':::'
+                temp = []
+                playerData = ':::'
                 for pos in self.player:
                     temp.append(string.join(pos, '---'))
-                playerData=playerData + string.join(temp, '***')
+                playerData = playerData + string.join(temp, '***')
                 for proto in self.clients:
                     proto.transport.write('[系统]: ' + self.msg + '\n')
                     proto.transport.write(playerData)
             elif prefix.find('pos') != -1:
-                playerName, x, y=content.split('---')
-                i=0
+                playerName, x, y = content.split('---')
+                i = 0
                 for p in self.player:
                     if p[0] == playerName:
-                        p[1]=x
-                        p[2]=y
+                        p[1] = x
+                        p[2] = y
                 for proto in self.clients:
                     proto.transport.write(data)
             else:
-                self.msg=data
+                self.msg = data
                 for proto in self.clients:
                     proto.transport.write(self.msg + '\n')

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
-import sys
+
 # from config import config
 from twisted.internet import protocol, reactor
 from core import factory
@@ -8,15 +8,16 @@ from mongoengine import *
 # Twisted Application Framework
 # echo_server.tac
 from twisted.application import internet, service
-import Pyro.core
+#import Pyro.core
 from core import pyroserver
 import time
 import threading
+import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 db = connect('wxsh')
 
-
+'''
 def pyroserverThread():
         # 监听端口，创建守护线程
     daemon = Pyro.core.Daemon(host='localhost', port=9000)
@@ -29,14 +30,14 @@ def pyroserverThread():
     daemon.connect(proxy, "echo")
     # 循环调用给
     daemon.requestLoop()
+'''
 
 
 def create_app(config_name):
-
-    t = threading.Thread(target=pyroserverThread, name='pyroserverThread')
-    t.start()
+    pass
+    #t = threading.Thread(target=pyroserverThread, name='pyroserverThread')
+    # t.start()
     # t.join() #挂起主线程，等待子线程执行完毕
-
 '''
 def create_app(config_name):
 

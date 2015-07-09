@@ -1,5 +1,7 @@
 # Twisted Application Framework
 # server.tac
+#!/usr/bin/env python
+#-*- coding: utf-8 -*-
 from app.models import Client
 from app.core import factory
 from twisted.application import internet, service

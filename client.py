@@ -5,7 +5,7 @@ from sys import stdout
 import Pyro.core
 
 PORT = 8006
-HOST = '127.0.0.1'  # 182.254.221.13
+HOST = '182.254.221.13'  # 182.254.221.13
 
 
 class Echo(Protocol):
@@ -36,7 +36,7 @@ class EchoClientFactory(ClientFactory):
     def clientConnectionFailed(self, connector, reason):
         print 'Connection failed. Reason:', reason
 
-
+'''
 # 远程调用地址
 url = 'PYROLOC://localhost:9000'
 # 创建代理对象，返回的就是就是一个Echo对象的实例
@@ -45,6 +45,6 @@ proxy = Pyro.core.getProxyForURI(url + "/echo")
 print proxy.say_hello("zhaolei")
 # 输出Hello 石头
 print proxy.say_hello("石头")
-
+'''
 reactor.connectTCP(HOST, PORT, EchoClientFactory())
 reactor.run()
