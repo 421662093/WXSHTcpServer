@@ -8,7 +8,7 @@ import os
 from app import create_app
 
 create_app(os.getenv('FLASK_CONFIG') or 'default')
-print '111'
+
 reactor.listenTCP(8006, factory.WXSHFactory())
 reactor.protocol = factory.WXSH
 reactor.callLater(10, factory.detection)
