@@ -5,7 +5,7 @@ from sys import stdout
 import Pyro.core
 
 PORT = 8006
-HOST = '182.254.221.13'  # 182.254.221.13
+HOST = '192.168.2.38'  # 182.254.221.13
 
 
 class Echo(Protocol):
@@ -18,7 +18,6 @@ class Echo(Protocol):
         print "invio", command
         #self.transport.write(command + '\n')
         self.transport.getHandle().sendall(command + '\r\n' + 'sss\r\n___')
-
 
 class EchoClientFactory(ClientFactory):
 

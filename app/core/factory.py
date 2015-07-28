@@ -3,6 +3,7 @@
 from twisted.internet.protocol import Factory
 from twisted.protocols.basic import LineOnlyReceiver
 from twisted.internet import reactor
+from twisted.protocols.policies import TimeoutMixin
 from twisted.python import log
 from ..models import Client, collection
 from . import common
@@ -16,6 +17,8 @@ import threading
 
 
 def detection():
+    log.msg(str(len(clientlist)))
+    '''
     for item in clientlist:
         try:
             if item.transport.getTcpKeepAlive():
@@ -29,11 +32,12 @@ def detection():
         except AttributeError:
             item.factory.delClient(item, item.getId())
             log.msg('remove attr')
+    '''
 
-'''
 def sayhello():
     global client
-    print u'检查活跃主机：'
+    print u'检查活跃主机：'+str(len(clientlist))
+    '''
     for item in clientlist:
         try:
             if item.transport.getTcpKeepAlive():
@@ -44,12 +48,13 @@ def sayhello():
                 print 'diushi1'
         except AttributeError:
             print 'diushi2'
+    '''
     global t  # Notice: use global variable!
     t=threading.Timer(5.0, sayhello)
     t.start()
 t=threading.Timer(5.0, sayhello)
 t.start()
-'''
+
 
 
 class WXSH(LineOnlyReceiver):
@@ -89,7 +94,7 @@ class WXSH(LineOnlyReceiver):
             print str(item.transport.getTcpKeepAlive()) + ':' + item.transport.getPeer().host
 
 
-class WXSHFactory(Factory):
+class WXSHFactory(Factory,TimeoutMixin):
     protocol = WXSH
 
     global clientlist
