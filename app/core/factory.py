@@ -119,6 +119,8 @@ class WXSHFactory(Factory,TimeoutMixin):
         if Client.getcount(dev_id) == 0:
             c = Client()
             c._id = collection.get_next_id('client')
+            c.user_id=1
+            c._type=1
             c.device_id = dev_id
             c.state = 1
             c.save()

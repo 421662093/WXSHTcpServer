@@ -36,6 +36,8 @@ class Client(Document):  # 客户端
         'collection': __tablename__,
     }
     _id = IntField(primary_key=True)
+    _type =  IntField(default=0, db_field='t')  # 类型
+    user_id =  IntField(default=0, db_field='u')  # 创建时间
     device_id = StringField(
         default='', max_length=64, required=True, db_field='di')
     activa_data = IntField(default=common.getstamp(), db_field='ad')  # 最后活动时间
