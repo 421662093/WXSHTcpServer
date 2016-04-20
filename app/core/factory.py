@@ -19,21 +19,16 @@ import threading
 
 def detection():
     #log.msg(str(len(clientlist)))
-    global clientlist
     for item in clientlist:
         try:
             if item.transport.getTcpKeepAlive():
-                item.transport.write(
-                    '{"ret":"' + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + '"}\n')
+                item.transport.write('{"ret":"'+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + '"}')
             else:
                 item.factory.delClient(item, item.getId())
                 log.msg('remove')
         except AttributeError:
             item.factory.delClient(item, item.getId())
             log.msg('remove attr')
-
-l = task.LoopingCall(detection)
-l.start(5.0) # call every second
 
 class WXSH(LineOnlyReceiver):
 

@@ -5,7 +5,7 @@ from sys import stdout
 import Pyro.core
 
 PORT = 8006
-HOST = '192.168.2.5'  # 101.201.143.22
+HOST = '101.201.143.22'  # 101.201.143.22
 
 
 class Echo(Protocol):

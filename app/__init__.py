@@ -8,14 +8,21 @@ from mongoengine import *
 # Twisted Application Framework
 # echo_server.tac
 from twisted.application import internet, service
+from twisted.internet import task
 #import Pyro.core
 from core import pyroserver
+from core.factory import detection
+
 import time
 import threading
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
-db = connect('wxsh')
+db = connect('wxsh',host='101.201.143.22')
+
+
+l = task.LoopingCall(detection)
+l.start(5.0) # call every second
 
 '''
 def pyroserverThread():
