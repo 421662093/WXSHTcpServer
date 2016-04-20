@@ -3,6 +3,7 @@
 from twisted.internet.protocol import Factory
 from twisted.protocols.basic import LineOnlyReceiver
 from twisted.internet import reactor
+from twisted.internet import task
 from twisted.protocols.policies import TimeoutMixin
 from twisted.python import log
 from ..models import Client, collection
@@ -17,45 +18,22 @@ import threading
 
 
 def detection():
-    log.msg(str(len(clientlist)))
-    '''
+    #log.msg(str(len(clientlist)))
+    global clientlist
     for item in clientlist:
         try:
             if item.transport.getTcpKeepAlive():
                 item.transport.write(
-                    'ret:' + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + '\n')
-                log.msg(str(item.transport.getTcpKeepAlive()) + ':' + item.transport.getPeer(
-                ).host + ':' + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+                    '{"ret":"' + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + '"}\n')
             else:
                 item.factory.delClient(item, item.getId())
                 log.msg('remove')
         except AttributeError:
             item.factory.delClient(item, item.getId())
             log.msg('remove attr')
-    '''
 
-def sayhello():
-    global client
-    print u'检查活跃主机：'+str(len(clientlist))
-    '''
-    for item in clientlist:
-        try:
-            if item.transport.getTcpKeepAlive():
-                item.transport.write(
-                    'ret:' + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + '\n')
-                print str(item.transport.getTcpKeepAlive()) + ':' + item.transport.getPeer().host + ':' + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-            else:
-                print 'diushi1'
-        except AttributeError:
-            print 'diushi2'
-    '''
-    global t  # Notice: use global variable!
-    t=threading.Timer(5.0, sayhello)
-    t.start()
-t=threading.Timer(5.0, sayhello)
-t.start()
-
-
+l = task.LoopingCall(detection)
+l.start(5.0) # call every second
 
 class WXSH(LineOnlyReceiver):
 

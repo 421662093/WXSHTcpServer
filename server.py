@@ -11,5 +11,5 @@ create_app(os.getenv('FLASK_CONFIG') or 'default')
 
 reactor.listenTCP(8006, factory.WXSHFactory())
 reactor.protocol = factory.WXSH
-reactor.callLater(10, factory.detection)
+#reactor.callLater(10, factory.detection)
 reactor.run()
